@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Age Calculator</title>
+    <meta name="description" content="A beautiful and precise age calculator for years, months, and days.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            margin-bottom: 32px;
+            font-size: 1rem;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+            min-width: 80px;
+        }
+
+        label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        input {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 12px;
+            color: white;
+            font-size: 1.1rem;
+            outline: none;
+            transition: all 0.2s;
+            width: 100%;
+            text-align: center;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            background: rgba(0, 0, 0, 0.3);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+        }
+
+        /* Remove arrows from number input */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        button {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 8px;
+        }
+
+        button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .result-container {
+            margin-top: 40px;
+            padding-top: 32px;
+            border-top: 1px solid var(--card-border);
+            display: none;
+        }
+
+        .result-container.active {
+            display: block;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .stat {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 16px;
+            border-radius: 16px;
+            border: 1px solid var(--card-border);
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #818cf8;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .error-msg {
+            color: #ef4444;
+            font-size: 0.9rem;
+            margin-top: 16px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Age Calculator</h1>
+        <p class="subtitle">Enter your birth date to calculate your age</p>
+        
+        <div class="input-group">
+            <div class="field">
+                <label for="day">Day</label>
+                <input type="number" id="day" placeholder="DD" min="1" max="31">
+            </div>
+            <div class="field">
+                <label for="month">Month</label>
+                <input type="number" id="month" placeholder="MM" min="1" max="12">
+            </div>
+            <div class="field">
+                <label for="year">Year</label>
+                <input type="number" id="year" placeholder="YYYY" min="1900" max="2100">
+            </div>
+        </div>
+
+        <button id="calcBtn" onclick="calculateAge()">Calculate Age</button>
+        <div id="error" class="error-msg">Please enter a valid date.</div>
+
+        <div class="result-container" id="resultContainer">
+            <div class="result-grid">
+                <div class="stat">
+                    <span class="stat-value" id="resYears">0</span>
+                    <span class="stat-label">Years</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value" id="resMonths">0</span>
+                    <span class="stat-label">Months</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value" id="resDays">0</span>
+                    <span class="stat-label">Days</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateAge() {
+            const dayInput = document.getElementById("day");
+            const monthInput = document.getElementById("month");
+            const yearInput = document.getElementById("year");
+            const error = document.getElementById("error");
+            const resultContainer = document.getElementById("resultContainer");
+
+            const day = parseInt(dayInput.value);
+            const month = parseInt(monthInput.value) - 1;
+            const year = parseInt(yearInput.value);
+
+            const birthDate = new Date(year, month, day);
+            const today = new Date();
+
+            // Reset UI
+            error.style.display = "none";
+            resultContainer.classList.remove("active");
+
+            // Validation
+            if (isNaN(birthDate.getTime()) || birthDate > today || 
+                birthDate.getDate() !== day || birthDate.getMonth() !== month) {
+                error.style.display = "block";
+                return;
+            }
+
+            let ageYears = today.getFullYear() - birthDate.getFullYear();
+            let ageMonths = today.getMonth() - birthDate.getMonth();
+            let ageDays = today.getDate() - birthDate.getDate();
+
+            if (ageDays < 0) {
+                ageMonths--;
+                // Get last day of previous month
+                const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+                ageDays += lastMonth.getDate();
+            }
+
+            if (ageMonths < 0) {
+                ageYears--;
+                ageMonths += 12;
+            }
+
+            // Animate numbers
+            animateValue("resYears", ageYears);
+            animateValue("resMonths", ageMonths);
+            animateValue("resDays", ageDays);
+            
+            resultContainer.classList.add("active");
+        }
+
+        function animateValue(id, value) {
+            const obj = document.getElementById(id);
+            let start = 0;
+            const duration = 800;
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Ease out cubic
+                const easeProgress = 1 - Math.pow(1 - progress, 3);
+                
+                obj.innerText = Math.floor(easeProgress * value);
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    obj.innerText = value;
+                }
+            }
+            requestAnimationFrame(update);
+        }
+
+        // Add keyboard support
+        [ "day", "month", "year" ].forEach(id => {
+            document.getElementById(id).addEventListener("keypress", (e) => {
+                if (e.key === "Enter") calculateAge();
+            });
+        });
+    </script>
+
+</body>
+</html>
